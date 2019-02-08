@@ -66,7 +66,28 @@ export default class Todo extends Component {
     });
   };
 
-  addTodo = title => {};
+  addTodo = async title => {
+    try {
+      let result = await fetch("https://jsonplaceholder.typicode.com/todos", {
+        method: "POST",
+        headers: {
+          Accept: "application/json, text/plain, */*",
+          "Content-type": "application/json"
+        },
+        body: JSON.stringify({
+          title: title
+        })
+      });
+
+      const newTodo = await result.json();
+      const todoList = this.state.todoList;
+      todoList.unshift(newTodo);
+
+      this.setState({ todoList: todoList });
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   render() {
     return (
@@ -75,6 +96,7 @@ export default class Todo extends Component {
           todoList={this.state.todoList}
           markCompleted={this.markCompleted}
           delTodo={this.delTodo}
+          addTodo={this.addTodo}
         />
       </>
     );

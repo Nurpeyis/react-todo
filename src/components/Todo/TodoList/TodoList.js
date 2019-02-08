@@ -10,7 +10,7 @@ export default class TodoList extends Component {
     return (
       <div className={styles.todoWrap}>
         <h1>Todo Manager</h1>
-        <TodoForm />
+        <TodoForm addTodo={this.props.addTodo} />
 
         <div className={styles.todoList}>
           {this.props.todoList.map(todo => {
