@@ -75,7 +75,8 @@ export default class Todo extends Component {
           "Content-type": "application/json"
         },
         body: JSON.stringify({
-          title: title
+          title: title,
+          completed: false
         })
       });
 
@@ -84,6 +85,8 @@ export default class Todo extends Component {
       todoList.unshift(newTodo);
 
       this.setState({ todoList: todoList });
+
+      console.log(this.state.todoList);
     } catch (error) {
       console.log(error);
     }
