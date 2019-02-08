@@ -13,10 +13,16 @@ export default class TodoList extends Component {
         <TodoForm />
 
         <div className={styles.todoList}>
-          <TodoItem />
-          <TodoItem />
-          <TodoItem />
-          <TodoItem />
+          {this.props.todoList.map(todo => {
+            return (
+              <TodoItem
+                key={todo.id}
+                todo={todo}
+                markCompleted={this.props.markCompleted}
+                delTodo={this.props.delTodo}
+              />
+            );
+          })}
         </div>
       </div>
     );
