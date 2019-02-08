@@ -7,11 +7,15 @@ export default class Todo extends Component {
     todoList: []
   };
 
+  queryUrl = "https://jsonplaceholder.typicode.com/todos";
+  queryHeaders = {
+    Accept: "application/json, text/plain, */*",
+    "Content-type": "application/json; charset=UTF-8"
+  };
+
   async componentDidMount() {
     try {
-      const result = await fetch(
-        "https://jsonplaceholder.typicode.com/todos?_limit=5"
-      );
+      const result = await fetch(`${this.queryUrl}?_limit=5`);
       const todoList = await result.json();
       const completedList = [];
       const uncompletedList = [];
@@ -34,30 +38,38 @@ export default class Todo extends Component {
     }
   }
 
-  markCompleted = id => {
+  markCompleted = async id => {
     let clickedTodo = this.state.todoList.find(todo => todo.id === id);
+    clickedTodo.completed = !clickedTodo.completed;
+
     let otherTodos = this.state.todoList.filter(todo => todo.id !== id);
 
-    if (!clickedTodo.completed) {
-      clickedTodo.completed = !clickedTodo.completed;
-      otherTodos.push(clickedTodo);
-    } else {
-      clickedTodo.completed = !clickedTodo.completed;
-      otherTodos.unshift(clickedTodo);
-    }
+    try {
+      let result = await fetch(`${this.queryUrl}/${id}`, {
+        method: "PUT",
+        headers: this.queryHeaders,
+        body: JSON.stringify(clickedTodo)
+      });
+      clickedTodo = await result.json();
 
-    this.setState({
-      todoList: otherTodos
-    });
+      if (clickedTodo.completed) {
+        otherTodos.push(clickedTodo);
+      } else {
+        otherTodos.unshift(clickedTodo);
+      }
+
+      this.setState({
+        todoList: otherTodos
+      });
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   delTodo = async id => {
-    await fetch(`https://jsonplaceholder.typicode.com/todos/${id}`, {
+    await fetch(`${this.queryUrl}/${id}`, {
       method: "DELETE",
-      headers: {
-        Accept: "application/json, text/plain, */*",
-        "Content-type": "application/json"
-      }
+      headers: this.queryHeaders
     });
 
     let todoList = this.state.todoList.filter(todo => todo.id !== id);
@@ -68,12 +80,9 @@ export default class Todo extends Component {
 
   addTodo = async title => {
     try {
-      let result = await fetch("https://jsonplaceholder.typicode.com/todos", {
+      let result = await fetch(this.queryUrl, {
         method: "POST",
-        headers: {
-          Accept: "application/json, text/plain, */*",
-          "Content-type": "application/json"
-        },
+        headers: this.queryHeaders,
         body: JSON.stringify({
           title: title,
           completed: false
@@ -85,8 +94,6 @@ export default class Todo extends Component {
       todoList.unshift(newTodo);
 
       this.setState({ todoList: todoList });
-
-      console.log(this.state.todoList);
     } catch (error) {
       console.log(error);
     }
